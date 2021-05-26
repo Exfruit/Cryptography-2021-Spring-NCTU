@@ -45,6 +45,7 @@ string hex_string(string source){
 	return value;
 }
 
+
 int main(int argc, char const *argv[])
 {
 	ofstream file;
@@ -52,6 +53,7 @@ int main(int argc, char const *argv[])
 
 	file << question("Bitcoin is a cryptocurrency, a form of electronic cash.") << endl;
 
+	int NONCE_int = 0;
 	string source = question("Bitcoin");
 	bool toBreak = false;
 	string Preimage, HashValue;
@@ -60,12 +62,16 @@ int main(int argc, char const *argv[])
 	file << source << endl;
 	file << "00000000" << endl;
 	file << hex_string(source + "00000000") << endl;
+	// cout << "Found 0!" << endl;
 	source = hex_string(source + "00000000");
 
 	for(int i = 1; i < 64; i++){
 		toBreak = false;
-		for(auto j = 0; j < 4294967295; j++){
+		for(long long j = NONCE_int; j <= 4294967295; j++){
+			
 			// cout << j << " " ;
+
+			//deal with nonce
 			stringstream sstream;
 			sstream << uppercase << std::hex << j;
 			string nonce = sstream.str();
@@ -91,6 +97,7 @@ int main(int argc, char const *argv[])
 				nonce = "0" + nonce;
 			}
 
+			//generate the hashvalue
 			Preimage = source + nonce;
 			HashValue = hex_string(Preimage);
 			/*if(i == 0){
@@ -114,8 +121,17 @@ int main(int argc, char const *argv[])
 						file << nonce << endl;
 						file << HashValue << endl;
 						source = HashValue;
+						NONCE_int = j;
+						// cout << "Found " << i << "!" << endl;
 					}
 				}
+			}
+			if(j % 1000000 == 0){
+				// cout << "Now is at nonce = " << j << " ..." << endl;
+			}
+			if(j == 4294967295){
+				// cout << "Not found any shit at # of leading zero = " << i << ", Fuck." << endl;
+				return 0;
 			}
 			if(toBreak == true){
 				break;
